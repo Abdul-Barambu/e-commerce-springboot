@@ -3,6 +3,7 @@ package com.abdul.ecommercespringbootbackend.service;
 import com.abdul.ecommercespringbootbackend.model.LocalUser;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,10 +32,17 @@ public class JwtService {
     }
 
     public String generateJwt(LocalUser user){
-        return JWT.create()
-                .withClaim(USERNAME_KEY, user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + (1000 * expiryInSeconds)))
-                .withIssuer(issuer)
-                .sign(algorithm);
+        try {
+            String jwtToken = JWT.create()
+                    .withClaim(USERNAME_KEY, user.getUsername())
+                    .withExpiresAt(new Date(System.currentTimeMillis() + (1000 * expiryInSeconds)))
+                    .withIssuer(issuer)
+                    .sign(algorithm);
+            return jwtToken;
+        } catch (JWTVerificationException exception){
+            // Log the exception for debugging
+            exception.printStackTrace();
+            return null;
+        }
     }
 }

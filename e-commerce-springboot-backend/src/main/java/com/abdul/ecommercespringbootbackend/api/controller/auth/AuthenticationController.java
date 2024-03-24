@@ -1,5 +1,7 @@
 package com.abdul.ecommercespringbootbackend.api.controller.auth;
 
+import com.abdul.ecommercespringbootbackend.api.model.LoginBody;
+import com.abdul.ecommercespringbootbackend.api.model.LoginResponse;
 import com.abdul.ecommercespringbootbackend.api.model.RegistrationBody;
 import com.abdul.ecommercespringbootbackend.exception.UserAlreadyExistException;
 import com.abdul.ecommercespringbootbackend.service.UserService;
@@ -25,6 +27,19 @@ public class AuthenticationController {
             return ResponseEntity.ok().build();
         }catch (UserAlreadyExistException e){
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+
+    @PostMapping(path = "/login")
+    public ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody LoginBody loginBody){
+        String jwt = userService.loginUser(loginBody);
+        if(jwt == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }else {
+            LoginResponse response = new LoginResponse();
+            response.setJwt(jwt);
+
+            return ResponseEntity.ok(response);
         }
     }
 
